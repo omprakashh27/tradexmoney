@@ -22,7 +22,7 @@ interface SidebarProps {
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'markets', label: 'Markets', icon: TrendingUp },
+  { id: 'charts', label: 'Charts', icon: TrendingUp },
   { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
   { id: 'orders', label: 'Orders', icon: FileText },
   { id: 'watchlist', label: 'Watchlist', icon: Star },

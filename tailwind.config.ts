@@ -30,6 +30,10 @@ export default {
           DEFAULT: "hsl(var(--loss))",
           foreground: "hsl(var(--loss-foreground))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

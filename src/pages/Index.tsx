@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNav } from '@/components/layout/TopNav';
-import { MarketCard } from '@/components/dashboard/MarketCard';
 import { CandlestickChart } from '@/components/dashboard/CandlestickChart';
+import { TradingChart } from '@/components/dashboard/TradingChart';
 import { Watchlist } from '@/components/dashboard/Watchlist';
-import { OrderBook } from '@/components/dashboard/OrderBook';
 import { RecentOrders } from '@/components/dashboard/RecentOrders';
 import { PortfolioSummary } from '@/components/dashboard/PortfolioSummary';
 import { QuickStats } from '@/components/dashboard/QuickStats';
@@ -100,6 +99,8 @@ const Index = () => {
 
   const handleSelectAsset = (asset: SearchableAsset) => {
     setSelectedAsset(asset);
+    // When selecting asset from search, switch to charts view
+    setActiveNavItem('charts');
   };
 
   const handleMarketCardClick = (index: typeof realtimeMarketIndices[0]) => {
@@ -112,6 +113,8 @@ const Index = () => {
       changePercent: index.changePercent,
       type: assetType,
     });
+    // When clicking market card, switch to charts view
+    setActiveNavItem('charts');
   };
 
   return (
@@ -147,7 +150,7 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-foreground capitalize">{activeNavItem}</h1>
               <p className="text-muted-foreground mt-1">
                 {activeNavItem === 'dashboard' && 'Welcome back! Here\'s your market overview.'}
-                {activeNavItem === 'markets' && 'Live market data and trends.'}
+                {activeNavItem === 'charts' && 'TradingView-style charts with live data.'}
                 {activeNavItem === 'portfolio' && 'Your investment portfolio summary.'}
                 {activeNavItem === 'orders' && 'View and manage your orders.'}
                 {activeNavItem === 'watchlist' && 'Your tracked assets.'}
@@ -193,25 +196,9 @@ const Index = () => {
             </>
           )}
 
-          {/* Markets View */}
-          {activeNavItem === 'markets' && (
-            <>
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {realtimeMarketIndices.map((index, i) => (
-                  <MarketCard 
-                    key={index.id} 
-                    data={index} 
-                    index={i} 
-                    updateDirection={getMarketUpdateDirection(index.id)}
-                    onClick={() => handleMarketCardClick(index)}
-                  />
-                ))}
-              </section>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <CandlestickChart selectedAsset={selectedAsset} />
-                <OrderBook />
-              </div>
-            </>
+          {/* Charts View - Full Width TradingView Style */}
+          {activeNavItem === 'charts' && (
+            <TradingChart selectedAsset={selectedAsset} />
           )}
 
           {/* Portfolio View */}

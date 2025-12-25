@@ -2,18 +2,24 @@ import { cn } from '@/lib/utils';
 import { buyOrders, sellOrders } from '@/data/mockData';
 import { ArrowUpDown } from 'lucide-react';
 
-export function OrderBook() {
+interface OrderBookProps {
+  hideHeader?: boolean;
+}
+
+export function OrderBook({ hideHeader = false }: OrderBookProps) {
   return (
-    <div className="glass-card rounded-xl p-5 animate-fade-in-up h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold text-foreground">Order Book</h2>
+    <div className="h-full">
+      {!hideHeader && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Order Book</h2>
+          </div>
+          <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+            BTC/USDT
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
-          BTC/USDT
-        </span>
-      </div>
+      )}
 
       {/* Header */}
       <div className="grid grid-cols-3 gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-2">
@@ -84,3 +90,5 @@ export function OrderBook() {
     </div>
   );
 }
+
+export default OrderBook;

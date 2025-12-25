@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { watchlistData } from '@/data/mockData';
 import { Star, Plus, X, TrendingUp, TrendingDown } from 'lucide-react';
+import type { WatchlistItem } from '@/data/mockData';
 
-export function Watchlist() {
-  const [items, setItems] = useState(watchlistData);
+interface WatchlistProps {
+  items: WatchlistItem[];
+  getUpdateDirection: (id: string) => 'up' | 'down' | 'none';
+}
+
+export function Watchlist({ items, getUpdateDirection }: WatchlistProps) {
+  const [localItems, setLocalItems] = useState<string[]>(items.map(i => i.id));
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
+  const visibleItems = items.filter(item => localItems.includes(item.id));
+
   const removeItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id));
+    setLocalItems(prev => prev.filter(itemId => itemId !== id));
   };
 
   return (
@@ -41,15 +48,18 @@ export function Watchlist() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {items.map((item, index) => {
+              {visibleItems.map((item, index) => {
                 const isPositive = item.change >= 0;
+                const updateDirection = getUpdateDirection(item.id);
                 return (
                   <tr
                     key={item.id}
                     style={{ animationDelay: `${index * 50}ms` }}
                     className={cn(
                       'animate-fade-in transition-colors duration-200 cursor-pointer',
-                      hoveredRow === item.id ? 'bg-accent/50' : 'hover:bg-accent/30'
+                      hoveredRow === item.id ? 'bg-accent/50' : 'hover:bg-accent/30',
+                      updateDirection === 'up' && 'price-flash-up',
+                      updateDirection === 'down' && 'price-flash-down'
                     )}
                     onMouseEnter={() => setHoveredRow(item.id)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -72,7 +82,14 @@ export function Watchlist() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <span className="text-sm font-semibold text-foreground">
+                      <span 
+                        key={`watchlist-price-${item.id}-${item.price.toFixed(2)}`}
+                        className={cn(
+                          'text-sm font-semibold text-foreground inline-block',
+                          updateDirection === 'up' && 'price-blink-up',
+                          updateDirection === 'down' && 'price-blink-down'
+                        )}
+                      >
                         ₹{item.price.toLocaleString()}
                       </span>
                     </td>

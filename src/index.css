@@ -194,6 +194,89 @@
     }
   }
 
+  /* Price update animations */
+  .price-flash-up {
+    animation: flash-up 0.5s ease-out;
+  }
+
+  .price-flash-down {
+    animation: flash-down 0.5s ease-out;
+  }
+
+  @keyframes flash-up {
+    0% {
+      background-color: hsl(var(--profit) / 0.3);
+      color: hsl(var(--profit));
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  @keyframes flash-down {
+    0% {
+      background-color: hsl(var(--loss) / 0.3);
+      color: hsl(var(--loss));
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .price-blink-up {
+    animation: blink-up 0.5s ease-out;
+  }
+
+  .price-blink-down {
+    animation: blink-down 0.5s ease-out;
+  }
+
+  @keyframes blink-up {
+    0%, 50% {
+      color: hsl(var(--profit));
+      text-shadow: 0 0 8px hsl(var(--profit) / 0.5);
+    }
+    100% {
+      text-shadow: none;
+    }
+  }
+
+  @keyframes blink-down {
+    0%, 50% {
+      color: hsl(var(--loss));
+      text-shadow: 0 0 8px hsl(var(--loss) / 0.5);
+    }
+    100% {
+      text-shadow: none;
+    }
+  }
+
+  .card-pulse-up {
+    animation: card-pulse-up 0.5s ease-out;
+  }
+
+  .card-pulse-down {
+    animation: card-pulse-down 0.5s ease-out;
+  }
+
+  @keyframes card-pulse-up {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--profit) / 0.4), 0 0 20px hsl(var(--profit) / 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--profit) / 0), 0 0 0 hsl(var(--profit) / 0);
+    }
+  }
+
+  @keyframes card-pulse-down {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--loss) / 0.4), 0 0 20px hsl(var(--loss) / 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--loss) / 0), 0 0 0 hsl(var(--loss) / 0);
+    }
+  }
+
   .gradient-border {
     position: relative;
   }

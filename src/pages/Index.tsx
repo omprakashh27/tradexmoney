@@ -8,12 +8,34 @@ import { Watchlist } from '@/components/dashboard/Watchlist';
 import { OrderBook } from '@/components/dashboard/OrderBook';
 import { RecentOrders } from '@/components/dashboard/RecentOrders';
 import { PortfolioSummary } from '@/components/dashboard/PortfolioSummary';
-import { marketIndices } from '@/data/mockData';
+import { marketIndices, watchlistData } from '@/data/mockData';
+import { useRealtimePrices } from '@/hooks/useRealtimePrices';
 
 const Index = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Real-time price simulation for market indices
+  const { 
+    data: realtimeMarketIndices, 
+    getUpdateDirection: getMarketUpdateDirection 
+  } = useRealtimePrices(marketIndices, 2000, 0.001);
+
+  // Real-time price simulation for watchlist
+  const { 
+    data: realtimeWatchlist, 
+    getUpdateDirection: getWatchlistUpdateDirection 
+  } = useRealtimePrices(watchlistData, 1500, 0.0015);
+
+  // Update current time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Initialize theme from localStorage
   useEffect(() => {
@@ -69,17 +91,26 @@ const Index = () => {
               </p>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Last updated:</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-profit opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-profit"></span>
+              </span>
+              <span>Live</span>
               <span className="font-medium text-foreground">
-                {new Date().toLocaleTimeString()}
+                {currentTime.toLocaleTimeString()}
               </span>
             </div>
           </div>
 
           {/* Market Overview Cards */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {marketIndices.map((index, i) => (
-              <MarketCard key={index.id} data={index} index={i} />
+            {realtimeMarketIndices.map((index, i) => (
+              <MarketCard 
+                key={index.id} 
+                data={index} 
+                index={i} 
+                updateDirection={getMarketUpdateDirection(index.id)}
+              />
             ))}
           </section>
 
@@ -93,7 +124,10 @@ const Index = () => {
 
             {/* Right Column - Watchlist & Order Book */}
             <div className="space-y-6">
-              <Watchlist />
+              <Watchlist 
+                items={realtimeWatchlist} 
+                getUpdateDirection={getWatchlistUpdateDirection} 
+              />
               <OrderBook />
             </div>
           </div>

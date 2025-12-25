@@ -10,12 +10,40 @@ import { RecentOrders } from '@/components/dashboard/RecentOrders';
 import { PortfolioSummary } from '@/components/dashboard/PortfolioSummary';
 import { marketIndices, watchlistData } from '@/data/mockData';
 import { useRealtimePrices } from '@/hooks/useRealtimePrices';
+import type { SearchableAsset } from '@/components/SearchBar';
+
+// Build searchable assets from market indices and watchlist
+const buildSearchableAssets = (
+  indices: typeof marketIndices,
+  watchlist: typeof watchlistData
+): SearchableAsset[] => {
+  const fromIndices: SearchableAsset[] = indices.map((item) => ({
+    id: `index-${item.id}`,
+    symbol: item.symbol,
+    name: item.name,
+    price: item.price,
+    changePercent: item.changePercent,
+    type: (item.symbol === 'BTC' || item.symbol === 'ETH' ? 'crypto' : 'index') as 'crypto' | 'index',
+  }));
+
+  const fromWatchlist: SearchableAsset[] = watchlist.map((item) => ({
+    id: `stock-${item.id}`,
+    symbol: item.symbol,
+    name: item.name,
+    price: item.price,
+    changePercent: item.changePercent,
+    type: 'stock' as const,
+  }));
+
+  return [...fromIndices, ...fromWatchlist];
+};
 
 const Index = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedAsset, setSelectedAsset] = useState<SearchableAsset | null>(null);
 
   // Real-time price simulation for market indices
   const { 
@@ -28,6 +56,9 @@ const Index = () => {
     data: realtimeWatchlist, 
     getUpdateDirection: getWatchlistUpdateDirection 
   } = useRealtimePrices(watchlistData, 1500, 0.0015);
+
+  // Build searchable assets with real-time prices
+  const searchableAssets = buildSearchableAssets(realtimeMarketIndices, realtimeWatchlist);
 
   // Update current time every second
   useEffect(() => {
@@ -57,6 +88,28 @@ const Index = () => {
     }
   };
 
+  const handleNavItemClick = (item: string) => {
+    setActiveNavItem(item);
+    // For now, all navigation stays on dashboard
+    // In a real app, you'd use react-router here
+  };
+
+  const handleSelectAsset = (asset: SearchableAsset) => {
+    setSelectedAsset(asset);
+  };
+
+  const handleMarketCardClick = (index: typeof realtimeMarketIndices[0]) => {
+    const assetType: 'crypto' | 'index' = index.symbol === 'BTC' || index.symbol === 'ETH' ? 'crypto' : 'index';
+    setSelectedAsset({
+      id: `index-${index.id}`,
+      symbol: index.symbol,
+      name: index.name,
+      price: index.price,
+      changePercent: index.changePercent,
+      type: assetType,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Sidebar */}
@@ -64,7 +117,7 @@ const Index = () => {
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         activeItem={activeNavItem}
-        onItemClick={setActiveNavItem}
+        onItemClick={handleNavItemClick}
       />
 
       {/* Top Navigation */}
@@ -72,6 +125,8 @@ const Index = () => {
         sidebarCollapsed={sidebarCollapsed}
         isDarkMode={isDarkMode}
         onToggleTheme={toggleTheme}
+        searchAssets={searchableAssets}
+        onSelectAsset={handleSelectAsset}
       />
 
       {/* Main Content */}
@@ -85,7 +140,7 @@ const Index = () => {
           {/* Page Header */}
           <div className="flex items-center justify-between animate-fade-in">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+              <h1 className="text-2xl font-bold text-foreground capitalize">{activeNavItem}</h1>
               <p className="text-muted-foreground mt-1">
                 Welcome back! Here's your market overview.
               </p>
@@ -110,6 +165,7 @@ const Index = () => {
                 data={index} 
                 index={i} 
                 updateDirection={getMarketUpdateDirection(index.id)}
+                onClick={() => handleMarketCardClick(index)}
               />
             ))}
           </section>
@@ -118,7 +174,7 @@ const Index = () => {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             {/* Left Column - Chart */}
             <div className="xl:col-span-2 space-y-6">
-              <PriceChart />
+              <PriceChart selectedAsset={selectedAsset} />
               <RecentOrders />
             </div>
 

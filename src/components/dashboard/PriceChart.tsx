@@ -1,23 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { chartData } from '@/data/mockData';
-import { TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import type { SearchableAsset } from '@/components/SearchBar';
 
 const timeframes = ['1D', '1W', '1M', '3M', '1Y', 'ALL'];
 
-export function PriceChart() {
+interface PriceChartProps {
+  selectedAsset?: SearchableAsset | null;
+}
+
+// Generate mock chart data based on asset
+function generateChartData(basePrice: number) {
+  const data = [];
+  let price = basePrice * 0.98;
+  for (let i = 0; i < 10; i++) {
+    const change = (Math.random() - 0.45) * basePrice * 0.01;
+    price = Math.max(price + change, basePrice * 0.9);
+    data.push({
+      time: `${9 + Math.floor(i * 0.5)}:${(i % 2) * 30 || '00'}`,
+      price: Math.round(price * 100) / 100,
+      volume: Math.floor(Math.random() * 2000) + 500,
+    });
+  }
+  return data;
+}
+
+export function PriceChart({ selectedAsset }: PriceChartProps) {
   const [activeTimeframe, setActiveTimeframe] = useState('1D');
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+  const [chartData, setChartData] = useState(() => generateChartData(98542.80));
+  const [currentPrice, setCurrentPrice] = useState(98542.80);
+  const [priceChange, setPriceChange] = useState(2341.50);
+
+  // Default display values
+  const defaultSymbol = 'BTC/USDT';
+  const defaultExchange = 'Binance';
+
+  const displaySymbol = selectedAsset 
+    ? selectedAsset.type === 'stock' 
+      ? selectedAsset.symbol 
+      : `${selectedAsset.symbol}/USDT`
+    : defaultSymbol;
+
+  const displayExchange = selectedAsset?.type === 'stock' ? 'NSE' : 'Binance';
+  const currencySymbol = selectedAsset?.type === 'stock' ? '₹' : '$';
+
+  // Update chart when asset changes
+  useEffect(() => {
+    if (selectedAsset) {
+      setCurrentPrice(selectedAsset.price);
+      setPriceChange(selectedAsset.price * (selectedAsset.changePercent / 100));
+      setChartData(generateChartData(selectedAsset.price));
+    }
+  }, [selectedAsset]);
+
+  // Simulate live price updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPrice((prev) => {
+        const change = (Math.random() - 0.5) * prev * 0.001;
+        return Math.round((prev + change) * 100) / 100;
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [selectedAsset]);
 
   const prices = chartData.map((d) => d.price);
-  const min = Math.min(...prices) - 100;
-  const max = Math.max(...prices) + 100;
+  const min = Math.min(...prices) - (Math.min(...prices) * 0.01);
+  const max = Math.max(...prices) + (Math.max(...prices) * 0.01);
   const range = max - min;
 
-  const currentPrice = 98542.80;
-  const priceChange = 2341.50;
-  const priceChangePercent = 2.43;
-  const isPositive = priceChange >= 0;
+  const priceChangePercent = selectedAsset?.changePercent ?? 2.43;
+  const isPositive = priceChangePercent >= 0;
 
   // Generate candlestick-like bars
   const bars = chartData.map((point, i) => {
@@ -36,14 +90,14 @@ export function PriceChart() {
         <div className="flex items-center gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-foreground">BTC/USDT</h2>
+              <h2 className="text-xl font-bold text-foreground">{displaySymbol}</h2>
               <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">
-                Binance
+                {displayExchange}
               </span>
             </div>
             <div className="flex items-center gap-3 mt-1">
-              <span className="text-3xl font-bold text-foreground">
-                ${currentPrice.toLocaleString()}
+              <span className="text-3xl font-bold text-foreground price-blink-up">
+                {currencySymbol}{currentPrice.toLocaleString()}
               </span>
               <div
                 className={cn(
@@ -82,8 +136,8 @@ export function PriceChart() {
         <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center w-full">
-              <span className="text-xs text-muted-foreground w-16 text-right pr-4">
-                ${(max - (range / 4) * i).toFixed(0)}
+              <span className="text-xs text-muted-foreground w-20 text-right pr-4">
+                {currencySymbol}{(max - (range / 4) * i).toFixed(currentPrice > 1000 ? 0 : 2)}
               </span>
               <div className="flex-1 border-t border-border/30" />
             </div>
@@ -91,7 +145,7 @@ export function PriceChart() {
         </div>
 
         {/* Candlestick Bars */}
-        <div className="absolute left-16 right-0 top-4 bottom-4 flex items-end justify-between gap-2">
+        <div className="absolute left-20 right-0 top-4 bottom-4 flex items-end justify-between gap-2">
           {bars.map((bar, i) => (
             <div
               key={i}
@@ -127,7 +181,7 @@ export function PriceChart() {
                   <div className="bg-popover border border-border rounded-lg p-3 shadow-xl min-w-[140px]">
                     <p className="text-xs text-muted-foreground">{bar.time}</p>
                     <p className="text-sm font-semibold text-foreground mt-1">
-                      ${bar.price.toLocaleString()}
+                      {currencySymbol}{bar.price.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Vol: {bar.volume.toLocaleString()}
@@ -141,11 +195,11 @@ export function PriceChart() {
 
         {/* Current Price Line */}
         <div
-          className="absolute left-16 right-0 border-t-2 border-dashed border-primary/50 flex items-center"
+          className="absolute left-20 right-0 border-t-2 border-dashed border-primary/50 flex items-center"
           style={{ top: `${((max - currentPrice) / range) * 100}%` }}
         >
           <span className="absolute right-0 -translate-y-1/2 px-2 py-0.5 bg-primary text-primary-foreground text-xs font-medium rounded">
-            ${currentPrice.toLocaleString()}
+            {currencySymbol}{currentPrice.toLocaleString()}
           </span>
         </div>
       </div>

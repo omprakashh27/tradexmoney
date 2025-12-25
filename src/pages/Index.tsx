@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNav } from '@/components/layout/TopNav';
 import { MarketCard } from '@/components/dashboard/MarketCard';
-import { PriceChart } from '@/components/dashboard/PriceChart';
+import { CandlestickChart } from '@/components/dashboard/CandlestickChart';
 import { Watchlist } from '@/components/dashboard/Watchlist';
 import { OrderBook } from '@/components/dashboard/OrderBook';
 import { RecentOrders } from '@/components/dashboard/RecentOrders';
@@ -208,7 +208,7 @@ const Index = () => {
                 ))}
               </section>
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <PriceChart selectedAsset={selectedAsset} />
+                <CandlestickChart selectedAsset={selectedAsset} />
                 <OrderBook />
               </div>
             </>
@@ -231,7 +231,7 @@ const Index = () => {
                 items={realtimeWatchlist} 
                 getUpdateDirection={getWatchlistUpdateDirection} 
               />
-              <PriceChart selectedAsset={selectedAsset} />
+              <CandlestickChart selectedAsset={selectedAsset} />
             </div>
           )}
 

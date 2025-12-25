@@ -43,7 +43,6 @@ const buildSearchableAssets = (
 
 const Index = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -126,8 +125,6 @@ const Index = () => {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         activeItem={activeNavItem}
         onItemClick={handleNavItemClick}
-        mobileOpen={mobileMenuOpen}
-        onMobileClose={() => setMobileMenuOpen(false)}
       />
 
       {/* Top Navigation */}
@@ -137,24 +134,21 @@ const Index = () => {
         onToggleTheme={toggleTheme}
         searchAssets={searchableAssets}
         onSelectAsset={handleSelectAsset}
-        onMobileMenuOpen={() => setMobileMenuOpen(true)}
       />
 
       {/* Main Content */}
       <main
         className={cn(
-          'pt-20 pb-8 px-4 lg:px-6 transition-all duration-300 min-h-screen',
-          // Mobile: no margin, Desktop: adjust for sidebar
-          'ml-0 lg:ml-16',
-          !sidebarCollapsed && 'lg:ml-64'
+          'pt-20 pb-8 px-6 transition-all duration-300 min-h-screen',
+          sidebarCollapsed ? 'ml-16' : 'ml-64'
         )}
       >
         <div className="max-w-[1800px] mx-auto space-y-6">
           {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex items-center justify-between animate-fade-in">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground capitalize">{activeNavItem}</h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1 hidden sm:block">
+              <h1 className="text-2xl font-bold text-foreground capitalize">{activeNavItem}</h1>
+              <p className="text-muted-foreground mt-1">
                 {activeNavItem === 'dashboard' && 'Welcome back! Here\'s your market overview.'}
                 {activeNavItem === 'charts' && 'TradingView-style charts with live data.'}
                 {activeNavItem === 'portfolio' && 'Your investment portfolio summary.'}
@@ -164,7 +158,7 @@ const Index = () => {
                 {activeNavItem === 'settings' && 'Manage your preferences.'}
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-profit opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-profit"></span>
@@ -183,7 +177,7 @@ const Index = () => {
               <QuickStats />
 
               {/* Market Pulse & Recent Activity */}
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-2">
                   <MarketPulse 
                     indices={realtimeMarketIndices}
@@ -219,7 +213,7 @@ const Index = () => {
 
           {/* Watchlist View */}
           {activeNavItem === 'watchlist' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <Watchlist 
                 items={realtimeWatchlist} 
                 getUpdateDirection={getWatchlistUpdateDirection} 

@@ -8,7 +8,6 @@ import {
   TrendingUp,
   Settings,
   LogOut,
-  Menu,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -25,7 +24,6 @@ interface TopNavProps {
   onToggleTheme: () => void;
   searchAssets: SearchableAsset[];
   onSelectAsset: (asset: SearchableAsset) => void;
-  onMobileMenuOpen?: () => void;
 }
 
 const notifications = [
@@ -34,29 +32,20 @@ const notifications = [
   { id: 3, title: 'Market opening in 30 minutes', time: '1 hour ago', type: 'market' },
 ];
 
-export function TopNav({ sidebarCollapsed, isDarkMode, onToggleTheme, searchAssets, onSelectAsset, onMobileMenuOpen }: TopNavProps) {
+export function TopNav({ sidebarCollapsed, isDarkMode, onToggleTheme, searchAssets, onSelectAsset }: TopNavProps) {
   return (
     <header
       className={cn(
         'fixed top-0 right-0 z-30 h-16 bg-background/80 backdrop-blur-xl border-b border-border transition-all duration-300',
-        // Mobile: full width, Desktop: adjust for sidebar
-        'left-0 lg:left-16',
-        !sidebarCollapsed && 'lg:left-64'
+        sidebarCollapsed ? 'left-16' : 'left-64'
       )}
     >
-      <div className="flex items-center justify-between h-full px-4 lg:px-6">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={onMobileMenuOpen}
-          className="p-2.5 rounded-xl bg-secondary hover:bg-accent transition-all duration-200 lg:hidden"
-        >
-          <Menu className="w-5 h-5 text-muted-foreground" />
-        </button>
+      <div className="flex items-center justify-between h-full px-6">
         {/* Search Bar */}
         <SearchBar assets={searchAssets} onSelectAsset={onSelectAsset} />
 
         {/* Right Section */}
-        <div className="flex items-center gap-2 sm:gap-4 ml-2 sm:ml-6">
+        <div className="flex items-center gap-4 ml-6">
           {/* Market Status */}
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-profit/10 border border-profit/20">
             <div className="w-2 h-2 rounded-full bg-profit animate-pulse" />

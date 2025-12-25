@@ -6,6 +6,7 @@ interface MarketCardProps {
   data: MarketIndex;
   index: number;
   updateDirection?: 'up' | 'down' | 'none';
+  onClick?: () => void;
 }
 
 function Sparkline({ data, isPositive }: { data: number[]; isPositive: boolean }) {
@@ -44,18 +45,16 @@ function Sparkline({ data, isPositive }: { data: number[]; isPositive: boolean }
   );
 }
 
-export function MarketCard({ data, index, updateDirection = 'none' }: MarketCardProps) {
+export function MarketCard({ data, index, updateDirection = 'none', onClick }: MarketCardProps) {
   const isPositive = data.change >= 0;
 
   return (
     <div
-      key={`${data.id}-${updateDirection}`}
+      onClick={onClick}
       style={{ animationDelay: `${index * 100}ms` }}
       className={cn(
         'glass-card rounded-xl p-5 animate-fade-in-up transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl group cursor-pointer gradient-border',
-        isPositive ? 'hover:glow-profit' : 'hover:glow-loss',
-        updateDirection === 'up' && 'card-pulse-up',
-        updateDirection === 'down' && 'card-pulse-down'
+        isPositive ? 'hover:glow-profit' : 'hover:glow-loss'
       )}
     >
       <div className="flex items-start justify-between mb-4">

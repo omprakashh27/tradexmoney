@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  Search,
   Bell,
   User,
   Moon,
@@ -10,7 +8,6 @@ import {
   TrendingUp,
   Settings,
   LogOut,
-  X,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -19,11 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SearchBar, SearchableAsset } from '@/components/SearchBar';
 
 interface TopNavProps {
   sidebarCollapsed: boolean;
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  searchAssets: SearchableAsset[];
+  onSelectAsset: (asset: SearchableAsset) => void;
 }
 
 const notifications = [
@@ -32,10 +32,7 @@ const notifications = [
   { id: 3, title: 'Market opening in 30 minutes', time: '1 hour ago', type: 'market' },
 ];
 
-export function TopNav({ sidebarCollapsed, isDarkMode, onToggleTheme }: TopNavProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchFocused, setSearchFocused] = useState(false);
-
+export function TopNav({ sidebarCollapsed, isDarkMode, onToggleTheme, searchAssets, onSelectAsset }: TopNavProps) {
   return (
     <header
       className={cn(
@@ -45,35 +42,7 @@ export function TopNav({ sidebarCollapsed, isDarkMode, onToggleTheme }: TopNavPr
     >
       <div className="flex items-center justify-between h-full px-6">
         {/* Search Bar */}
-        <div className="flex-1 max-w-xl">
-          <div
-            className={cn(
-              'relative flex items-center transition-all duration-300',
-              searchFocused && 'scale-[1.02]'
-            )}
-          >
-            <Search className="absolute left-4 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search stocks, crypto, ETFs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-              className={cn(
-                'w-full pl-11 pr-4 py-2.5 rounded-xl bg-secondary border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-secondary/80 transition-all duration-200'
-              )}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-4 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+        <SearchBar assets={searchAssets} onSelectAsset={onSelectAsset} />
 
         {/* Right Section */}
         <div className="flex items-center gap-4 ml-6">

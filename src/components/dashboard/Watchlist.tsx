@@ -54,12 +54,9 @@ export function Watchlist({ items, getUpdateDirection }: WatchlistProps) {
                 return (
                   <tr
                     key={item.id}
-                    style={{ animationDelay: `${index * 50}ms` }}
                     className={cn(
-                      'animate-fade-in transition-colors duration-200 cursor-pointer',
-                      hoveredRow === item.id ? 'bg-accent/50' : 'hover:bg-accent/30',
-                      updateDirection === 'up' && 'price-flash-up',
-                      updateDirection === 'down' && 'price-flash-down'
+                      'transition-colors duration-200 cursor-pointer',
+                      hoveredRow === item.id ? 'bg-accent/50' : 'hover:bg-accent/30'
                     )}
                     onMouseEnter={() => setHoveredRow(item.id)}
                     onMouseLeave={() => setHoveredRow(null)}

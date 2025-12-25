@@ -6,13 +6,11 @@ import {
   Briefcase,
   FileText,
   Star,
-  BarChart3,
   Settings,
   ChevronLeft,
   ChevronRight,
   Zap,
 } from 'lucide-react';
-
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
@@ -26,7 +24,6 @@ const navItems = [
   { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
   { id: 'orders', label: 'Orders', icon: FileText },
   { id: 'watchlist', label: 'Watchlist', icon: Star },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 

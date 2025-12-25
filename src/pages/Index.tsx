@@ -42,7 +42,7 @@ const buildSearchableAssets = (
 };
 
 const Index = () => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [activeNavItem, setActiveNavItem] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());

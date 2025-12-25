@@ -82,24 +82,24 @@ export function SearchBar({ assets, onSelectAsset }: SearchBarProps) {
   }, []);
 
   return (
-    <div className="relative flex-1 max-w-xl">
+    <div className="relative flex-1 max-w-xs sm:max-w-md lg:max-w-xl">
       <div
         className={cn(
           'relative flex items-center transition-all duration-300',
           isFocused && 'scale-[1.02]'
         )}
       >
-        <Search className="absolute left-4 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-3 sm:left-4 w-4 h-4 text-muted-foreground" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search stocks, crypto, ETFs..."
+          placeholder="Search..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onKeyDown={handleKeyDown}
           className={cn(
-            'w-full pl-11 pr-4 py-2.5 rounded-xl bg-secondary border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-secondary/80 transition-all duration-200'
+            'w-full pl-9 sm:pl-11 pr-4 py-2 sm:py-2.5 rounded-xl bg-secondary border border-transparent text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-secondary/80 transition-all duration-200'
           )}
         />
         {query && (

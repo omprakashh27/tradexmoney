@@ -5,6 +5,7 @@ import type { MarketIndex } from '@/data/mockData';
 interface MarketCardProps {
   data: MarketIndex;
   index: number;
+  updateDirection?: 'up' | 'down' | 'none';
 }
 
 function Sparkline({ data, isPositive }: { data: number[]; isPositive: boolean }) {
@@ -43,15 +44,18 @@ function Sparkline({ data, isPositive }: { data: number[]; isPositive: boolean }
   );
 }
 
-export function MarketCard({ data, index }: MarketCardProps) {
+export function MarketCard({ data, index, updateDirection = 'none' }: MarketCardProps) {
   const isPositive = data.change >= 0;
 
   return (
     <div
+      key={`${data.id}-${updateDirection}`}
       style={{ animationDelay: `${index * 100}ms` }}
       className={cn(
         'glass-card rounded-xl p-5 animate-fade-in-up transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl group cursor-pointer gradient-border',
-        isPositive ? 'hover:glow-profit' : 'hover:glow-loss'
+        isPositive ? 'hover:glow-profit' : 'hover:glow-loss',
+        updateDirection === 'up' && 'card-pulse-up',
+        updateDirection === 'down' && 'card-pulse-down'
       )}
     >
       <div className="flex items-start justify-between mb-4">
@@ -82,7 +86,14 @@ export function MarketCard({ data, index }: MarketCardProps) {
 
       <div className="flex items-end justify-between">
         <div>
-          <span className="text-2xl font-bold text-foreground">
+          <span 
+            key={`price-${data.id}-${data.price.toFixed(2)}`}
+            className={cn(
+              'text-2xl font-bold text-foreground inline-block',
+              updateDirection === 'up' && 'price-blink-up',
+              updateDirection === 'down' && 'price-blink-down'
+            )}
+          >
             {data.price.toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

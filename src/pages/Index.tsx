@@ -8,6 +8,10 @@ import { Watchlist } from '@/components/dashboard/Watchlist';
 import { OrderBook } from '@/components/dashboard/OrderBook';
 import { RecentOrders } from '@/components/dashboard/RecentOrders';
 import { PortfolioSummary } from '@/components/dashboard/PortfolioSummary';
+import { QuickStats } from '@/components/dashboard/QuickStats';
+import { TopMovers } from '@/components/dashboard/TopMovers';
+import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { MarketPulse } from '@/components/dashboard/MarketPulse';
 import { marketIndices, watchlistData } from '@/data/mockData';
 import { useRealtimePrices } from '@/hooks/useRealtimePrices';
 import type { SearchableAsset } from '@/components/SearchBar';
@@ -166,39 +170,26 @@ const Index = () => {
           {/* Dashboard View */}
           {activeNavItem === 'dashboard' && (
             <>
-              {/* Market Overview Cards */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {realtimeMarketIndices.map((index, i) => (
-                  <MarketCard 
-                    key={index.id} 
-                    data={index} 
-                    index={i} 
-                    updateDirection={getMarketUpdateDirection(index.id)}
-                    onClick={() => handleMarketCardClick(index)}
-                  />
-                ))}
-              </section>
+              {/* Quick Stats */}
+              <QuickStats />
 
-              {/* Main Dashboard Grid */}
+              {/* Market Pulse & Recent Activity */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {/* Left Column - Chart */}
-                <div className="xl:col-span-2 space-y-6">
-                  <PriceChart selectedAsset={selectedAsset} />
-                  <RecentOrders />
-                </div>
-
-                {/* Right Column - Watchlist & Order Book */}
-                <div className="space-y-6">
-                  <Watchlist 
-                    items={realtimeWatchlist} 
-                    getUpdateDirection={getWatchlistUpdateDirection} 
+                <div className="xl:col-span-2">
+                  <MarketPulse 
+                    indices={realtimeMarketIndices}
+                    getUpdateDirection={getMarketUpdateDirection}
+                    onSelectIndex={handleMarketCardClick}
                   />
-                  <OrderBook />
                 </div>
+                <RecentActivity />
               </div>
 
-              {/* Portfolio Summary */}
-              <PortfolioSummary />
+              {/* Top Movers */}
+              <TopMovers 
+                items={realtimeWatchlist} 
+                getUpdateDirection={getWatchlistUpdateDirection}
+              />
             </>
           )}
 

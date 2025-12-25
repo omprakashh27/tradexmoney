@@ -142,7 +142,13 @@ const Index = () => {
             <div>
               <h1 className="text-2xl font-bold text-foreground capitalize">{activeNavItem}</h1>
               <p className="text-muted-foreground mt-1">
-                Welcome back! Here's your market overview.
+                {activeNavItem === 'dashboard' && 'Welcome back! Here\'s your market overview.'}
+                {activeNavItem === 'markets' && 'Live market data and trends.'}
+                {activeNavItem === 'portfolio' && 'Your investment portfolio summary.'}
+                {activeNavItem === 'orders' && 'View and manage your orders.'}
+                {activeNavItem === 'watchlist' && 'Your tracked assets.'}
+                {activeNavItem === 'analytics' && 'Portfolio performance and insights.'}
+                {activeNavItem === 'settings' && 'Manage your preferences.'}
               </p>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -157,39 +163,101 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Market Overview Cards */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {realtimeMarketIndices.map((index, i) => (
-              <MarketCard 
-                key={index.id} 
-                data={index} 
-                index={i} 
-                updateDirection={getMarketUpdateDirection(index.id)}
-                onClick={() => handleMarketCardClick(index)}
-              />
-            ))}
-          </section>
+          {/* Dashboard View */}
+          {activeNavItem === 'dashboard' && (
+            <>
+              {/* Market Overview Cards */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {realtimeMarketIndices.map((index, i) => (
+                  <MarketCard 
+                    key={index.id} 
+                    data={index} 
+                    index={i} 
+                    updateDirection={getMarketUpdateDirection(index.id)}
+                    onClick={() => handleMarketCardClick(index)}
+                  />
+                ))}
+              </section>
 
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column - Chart */}
-            <div className="xl:col-span-2 space-y-6">
-              <PriceChart selectedAsset={selectedAsset} />
-              <RecentOrders />
-            </div>
+              {/* Main Dashboard Grid */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Left Column - Chart */}
+                <div className="xl:col-span-2 space-y-6">
+                  <PriceChart selectedAsset={selectedAsset} />
+                  <RecentOrders />
+                </div>
 
-            {/* Right Column - Watchlist & Order Book */}
-            <div className="space-y-6">
+                {/* Right Column - Watchlist & Order Book */}
+                <div className="space-y-6">
+                  <Watchlist 
+                    items={realtimeWatchlist} 
+                    getUpdateDirection={getWatchlistUpdateDirection} 
+                  />
+                  <OrderBook />
+                </div>
+              </div>
+
+              {/* Portfolio Summary */}
+              <PortfolioSummary />
+            </>
+          )}
+
+          {/* Markets View */}
+          {activeNavItem === 'markets' && (
+            <>
+              <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {realtimeMarketIndices.map((index, i) => (
+                  <MarketCard 
+                    key={index.id} 
+                    data={index} 
+                    index={i} 
+                    updateDirection={getMarketUpdateDirection(index.id)}
+                    onClick={() => handleMarketCardClick(index)}
+                  />
+                ))}
+              </section>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <PriceChart selectedAsset={selectedAsset} />
+                <OrderBook />
+              </div>
+            </>
+          )}
+
+          {/* Portfolio View */}
+          {activeNavItem === 'portfolio' && (
+            <PortfolioSummary />
+          )}
+
+          {/* Orders View */}
+          {activeNavItem === 'orders' && (
+            <RecentOrders />
+          )}
+
+          {/* Watchlist View */}
+          {activeNavItem === 'watchlist' && (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <Watchlist 
                 items={realtimeWatchlist} 
                 getUpdateDirection={getWatchlistUpdateDirection} 
               />
-              <OrderBook />
+              <PriceChart selectedAsset={selectedAsset} />
             </div>
-          </div>
+          )}
 
-          {/* Portfolio Summary */}
-          <PortfolioSummary />
+          {/* Analytics View */}
+          {activeNavItem === 'analytics' && (
+            <PortfolioSummary />
+          )}
+
+          {/* Settings View */}
+          {activeNavItem === 'settings' && (
+            <div className="glass-card rounded-xl p-8 animate-fade-in">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Settings</h2>
+              <p className="text-muted-foreground">
+                Settings page coming soon. Configure your preferences here.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>

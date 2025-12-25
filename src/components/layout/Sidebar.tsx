@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -10,12 +9,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  X,
 } from 'lucide-react';
+
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   activeItem: string;
   onItemClick: (item: string) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const navItems = [
@@ -27,14 +30,77 @@ const navItems = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export function Sidebar({ collapsed, onToggle, activeItem, onItemClick }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, activeItem, onItemClick, mobileOpen, onMobileClose }: SidebarProps) {
+  const handleNavClick = (item: string) => {
+    onItemClick(item);
+    onMobileClose?.();
+  };
+
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-0 z-40 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col',
-        collapsed ? 'w-16' : 'w-64'
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
       )}
-    >
+      
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col',
+          // Desktop
+          'hidden lg:flex',
+          collapsed ? 'lg:w-16' : 'lg:w-64'
+        )}
+      >
+        {/* Desktop Sidebar Content */}
+        <SidebarContent 
+          collapsed={collapsed} 
+          activeItem={activeItem} 
+          onItemClick={onItemClick}
+          onToggle={onToggle}
+          showToggle
+        />
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 h-screen w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 flex flex-col lg:hidden',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {/* Mobile Close Button */}
+        <button
+          onClick={onMobileClose}
+          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-sidebar-accent transition-colors"
+        >
+          <X className="w-5 h-5 text-sidebar-foreground" />
+        </button>
+        
+        <SidebarContent 
+          collapsed={false} 
+          activeItem={activeItem} 
+          onItemClick={handleNavClick}
+          showToggle={false}
+        />
+      </aside>
+    </>
+  );
+}
+
+interface SidebarContentProps {
+  collapsed: boolean;
+  activeItem: string;
+  onItemClick: (item: string) => void;
+  onToggle?: () => void;
+  showToggle?: boolean;
+}
+
+function SidebarContent({ collapsed, activeItem, onItemClick, onToggle, showToggle }: SidebarContentProps) {
+  return (
+    <>
       {/* Logo */}
       <div className="flex items-center h-16 px-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
@@ -85,22 +151,24 @@ export function Sidebar({ collapsed, onToggle, activeItem, onItemClick }: Sideba
         })}
       </nav>
 
-      {/* Collapse Toggle */}
-      <div className="p-3 border-t border-sidebar-border">
-        <button
-          onClick={onToggle}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-5 h-5" />
-          ) : (
-            <>
-              <ChevronLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Collapse</span>
-            </>
-          )}
-        </button>
-      </div>
-    </aside>
+      {/* Collapse Toggle - Desktop Only */}
+      {showToggle && (
+        <div className="p-3 border-t border-sidebar-border">
+          <button
+            onClick={onToggle}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+          >
+            {collapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <>
+                <ChevronLeft className="w-5 h-5" />
+                <span className="text-sm font-medium">Collapse</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
+    </>
   );
 }
